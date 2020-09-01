@@ -46,6 +46,11 @@ def handle_cookers():
     print("You have recived all cookers") 
     return jsonify(Cooker.getUsers()), 200
 
+@app.route('/cookers/<int:id>', methods=['DELETE'])
+def handle_delete_cooker(id):
+    Cooker.deleteCooker(id) 
+    return "You have delete cooker"
+
 @app.route('/order', methods=['POST'])
 def handle_new_order():
     new_order = request.get_json()
@@ -61,6 +66,11 @@ def handle_orders():
 def handle_order(id):
     print("You have recived one cooker") 
     return jsonify(Order.getOrder(id)), 200
+
+@app.route('/orders/<int:id>', methods=['DELETE'])
+def handle_delete_order(id):
+    Order.deleteOrder(id) 
+    return "You have delete order"
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

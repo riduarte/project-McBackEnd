@@ -29,13 +29,11 @@ class Cooker(db.Model):
     def getUsers():
         all_cookers= Cooker.query.all()
         all_cookers = list(map(lambda x: x.serialize(), all_cookers))
-        
         return all_cookers
     
     def getUser(cooker_id):
         cooker= Cooker.query.filter_by(id = cooker_id).first()
         cooker = cooker.serialize()
-       
         return cooker
     
     def addCooker(cooker_data):
@@ -50,7 +48,11 @@ class Cooker(db.Model):
 
         db.session.add(cooker_new)
         db.session.commit()
-
+   
+    def deleteCooker(id):
+        delete_cooker= Cooker.query.get(id)
+        db.session.delete(delete_cooker)
+        db.session.commit()
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -83,15 +85,17 @@ class Order(db.Model):
         db.session.add(order_new)
         db.session.commit()
 
-
     def getOrders():
         all_orders= Order.query.all()
         all_orders = list(map(lambda x: x.serialize(), all_orders))
-        
         return all_orders
 
     def getOrder(order_id):
         order= Order.query.filter_by(id = order_id).first()
         order= order.serialize()
-        
         return order
+
+    def deleteOrder(id):
+        delete_order= Order.query.get(id)
+        db.session.delete(delete_order)
+        db.session.commit()
