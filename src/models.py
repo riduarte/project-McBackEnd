@@ -12,7 +12,7 @@ class Cooker(db.Model):
     enterprise = db.Column(db.String(100), unique=False, nullable=False)
     name= db.Column(db.String(80), unique=False, nullable=False)
     last_name= db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False) 
+    is_active = db.Column(db.Boolean(True), unique=False, nullable=False) 
     child = db.relationship('Order', lazy=True)
 
     def __repr__(self):
@@ -25,19 +25,18 @@ class Cooker(db.Model):
             "enterprise":self.enterprise,
             "name":self.name,
             "last_name":self.last_name,
-            "is_active":self.is_active
         }
-    def getUsers():
-        all_cookers= Cooker.query.filter_by( is_active = True).first()
-        all_cookers= all_cookers.serialize()
+    def get_users():
+        all_cookers= Cooker.query.filter_by( is_active = True)
+        all_cookers= list(map(lambda x: x.serialize(),all_cookers))
         return all_cookers
     
-    def getUser(cooker_id):
+    def get_user(cooker_id):
         cooker= Cooker.query.filter_by(id = cooker_id).first()
         cooker = cooker.serialize()
         return cooker
     
-    def setUser(id, body):
+    def set_user(id, body):
         cooker= Cooker.query.get(id)
         for key, value in body.items():
             if key != "id":
@@ -45,7 +44,7 @@ class Cooker(db.Model):
 
         db.session.commit()
    
-    def addCooker(cooker_data):
+    def add_cooker(cooker_data):
         cooker_new= Cooker()
         cooker_new.nickname = cooker_data["nickname"]
         cooker_new.email = cooker_data["email"]
@@ -57,8 +56,9 @@ class Cooker(db.Model):
 
         db.session.add(cooker_new)
         db.session.commit()
+
    
-    def deleteCooker(id):
+    def delete_cooker(id):
         delete_cooker= Cooker.query.get(id)
         delete_cooker.is_active= False
         db.session.commit()
@@ -69,7 +69,7 @@ class Order(db.Model):
     status = db.Column(db.String(80), unique=False, nullable=False)
     time = db.Column(db.Integer, unique=False,nullable=False)
     brand= db.Column(db.String(170), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(True), unique=False, nullable=False)
     parent_id= db.Column (db.Integer, db.ForeignKey ('cooker.id'))
 
     def __repr__(self):
@@ -83,7 +83,7 @@ class Order(db.Model):
             "brand":self.brand
         }
         
-    def addOrder(order_data):
+    def add_order(order_data):
         order_new= Order()
         order_new.order_code = order_data["order_code"]
         order_new.status = order_data["status"]
@@ -94,13 +94,13 @@ class Order(db.Model):
         db.session.add(order_new)
         db.session.commit()
 
-    def getOrders():
+    def get_orders():
         all_orders= Order.query.filter_by( is_active = True).first()
         all_orders= all_orders.serialize()
         return all_orders
 
 
-    def getOrder(order_id):
+    def get_order(order_id):
         order= Order.query.filter_by(id = order_id).first()
         order= order.serialize()
         return order
@@ -113,7 +113,7 @@ class Order(db.Model):
 
         db.session.commit()
 
-    def deleteOrder(id):
+    def delete_order(id):
         delete_order= Order.query.get(id)
-        db.session.delete(delete_order)
+        delete_order.is_active= False
         db.session.commit()

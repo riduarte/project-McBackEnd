@@ -1,6 +1,3 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
 import os
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
@@ -33,56 +30,54 @@ def sitemap():
 @app.route('/cooker', methods=['POST'])
 def handle_new_cooker():
     new_cooker = request.get_json()
-    Cooker.addCooker(new_cooker)
-    return "You creater new cooker", 200 
+    Cooker.add_cooker(new_cooker)
+    return  "s",200
 
 @app.route('/cookers/<int:id>', methods=['GET'])
 def handle_cooker(id):
-    print("You have recived one cooker") 
-    return jsonify(Cooker.getUser(id)), 200
+    return jsonify(Cooker.get_user(id)), 200
 
 @app.route('/cookers', methods=['GET'])
 def handle_cookers():
-    print("You have recived all cookers") 
-    return jsonify(Cooker.getUsers()), 200
+    return jsonify(Cooker.get_users()), 200
 
 @app.route('/cookers/<int:id>', methods=['PATCH', 'PUT'])
 def handle_edit_Cooker(id): 
     cooker_edit= request.get_json()
-    Cooker.setUser(id,cooker_edit)
-    return "You have modificate  cooker", 201
+    Cooker.set_user(id,cooker_edit)
+    return "You have modificate  cooker", 203
 
 @app.route('/cookers/<int:id>', methods=['DELETE'])
 def handle_delete_cooker(id):
-    Cooker.deleteCooker(id) 
+    Cooker.delete_cooker(id) 
     return "You have delete cooker"
 
 @app.route('/order', methods=['POST'])
 def handle_new_order():
     new_order = request.get_json()
-    Order.addOrder(new_order)
-    return "You creater new order", 200 
+    Order.add_order(new_order)
+    return "You creater new order", 201 
 
 @app.route('/orders', methods=['GET'])
 def handle_orders():
     print("You have recived all orders") 
-    return jsonify(Order.getOrders()), 200
+    return jsonify(Order.get_orders()), 200
 
 @app.route('/orders/<int:id>', methods=['GET'])
 def handle_order(id):
     print("You have recived one cooker") 
-    return jsonify(Order.getOrder(id)), 200
+    return jsonify(Order.get_order(id)), 200
 
 @app.route('/orders/<int:id>', methods=['PATCH', 'PUT'])
 def handle_edit_order(id):
     order_edit= request.get_json()
-    Order.setOrder(id,order_edit)
-    return "You have modificate order", 201
+    Order.set_order(id,order_edit)
+    return "You have modificate order", 203
 
 @app.route('/orders/<int:id>', methods=['DELETE'])
 def handle_delete_order(id):
-    Order.deleteOrder(id) 
-    return "You have delete order"
+    Order.delete_order(id) 
+    return "You have delete order", 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
