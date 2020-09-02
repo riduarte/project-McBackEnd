@@ -12,7 +12,7 @@ class Cooker(db.Model):
     enterprise = db.Column(db.String(100), unique=False, nullable=False)
     name= db.Column(db.String(80), unique=False, nullable=False)
     last_name= db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(), unique=False, nullable=False) 
     child = db.relationship('Order', lazy=True)
 
     def __repr__(self):
@@ -24,11 +24,12 @@ class Cooker(db.Model):
             "email": self.email,
             "enterprise":self.enterprise,
             "name":self.name,
-            "last_name":self.last_name
+            "last_name":self.last_name,
+            "is_active":self.is_active
         }
     def getUsers():
-        all_cookers= Cooker.query.all()
-        all_cookers = list(map(lambda x: x.serialize(), all_cookers))
+        all_cookers= Cooker.query.filter_by( is_active = True).first()
+        all_cookers= all_cookers.serialize()
         return all_cookers
     
     def getUser(cooker_id):
@@ -59,7 +60,7 @@ class Cooker(db.Model):
    
     def deleteCooker(id):
         delete_cooker= Cooker.query.get(id)
-        db.session.delete(delete_cooker)
+        delete_cooker.is_active= False
         db.session.commit()
 
 class Order(db.Model):
@@ -94,9 +95,10 @@ class Order(db.Model):
         db.session.commit()
 
     def getOrders():
-        all_orders= Order.query.all()
-        all_orders = list(map(lambda x: x.serialize(), all_orders))
+        all_orders= Order.query.filter_by( is_active = True).first()
+        all_orders= all_orders.serialize()
         return all_orders
+
 
     def getOrder(order_id):
         order= Order.query.filter_by(id = order_id).first()
