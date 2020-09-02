@@ -13,14 +13,14 @@ class Cooker(db.Model):
     name= db.Column(db.String(80), unique=False, nullable=False)
     last_name= db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    order = db.relationship('Order', lazy=True)
+    child = db.relationship('Order', lazy=True)
 
     def __repr__(self):
         return f'<Cooker {self.nickname}>'
 
     def serialize(self):
         return {
-            "id": self.id,
+            "nickname": self.nickname,
             "email": self.email,
             "enterprise":self.enterprise,
             "name":self.name,
@@ -36,6 +36,14 @@ class Cooker(db.Model):
         cooker = cooker.serialize()
         return cooker
     
+    def setUser(id, body):
+        cooker= Cooker.query.get(id)
+        for key, value in body.items():
+            if key != "id":
+                setattr(cooker,key,value)
+
+        db.session.commit()
+   
     def addCooker(cooker_data):
         cooker_new= Cooker()
         cooker_new.nickname = cooker_data["nickname"]
@@ -61,7 +69,7 @@ class Order(db.Model):
     time = db.Column(db.Integer, unique=False,nullable=False)
     brand= db.Column(db.String(170), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    cooker_id= db.Column (db.Integer, db.ForeignKey ('cooker.id'))
+    parent_id= db.Column (db.Integer, db.ForeignKey ('cooker.id'))
 
     def __repr__(self):
         return f'<Order {self.order_code}>'
@@ -94,6 +102,14 @@ class Order(db.Model):
         order= Order.query.filter_by(id = order_id).first()
         order= order.serialize()
         return order
+
+    def setOrder(id, body):
+        order= Order.query.get(id)
+        for key, value in body.items():
+            if key != "id":
+                setattr(order,key,value)
+
+        db.session.commit()
 
     def deleteOrder(id):
         delete_order= Order.query.get(id)

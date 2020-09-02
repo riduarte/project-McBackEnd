@@ -46,6 +46,12 @@ def handle_cookers():
     print("You have recived all cookers") 
     return jsonify(Cooker.getUsers()), 200
 
+@app.route('/cookers/<int:id>', methods=['PATCH', 'PUT'])
+def handle_edit_Cooker(id): 
+    cooker_edit= request.get_json()
+    Cooker.setUser(id,cooker_edit)
+    return "You have modificate  cooker", 201
+
 @app.route('/cookers/<int:id>', methods=['DELETE'])
 def handle_delete_cooker(id):
     Cooker.deleteCooker(id) 
@@ -66,6 +72,12 @@ def handle_orders():
 def handle_order(id):
     print("You have recived one cooker") 
     return jsonify(Order.getOrder(id)), 200
+
+@app.route('/orders/<int:id>', methods=['PATCH', 'PUT'])
+def handle_edit_order(id):
+    order_edit= request.get_json()
+    Order.setOrder(id,order_edit)
+    return "You have modificate order", 201
 
 @app.route('/orders/<int:id>', methods=['DELETE'])
 def handle_delete_order(id):
