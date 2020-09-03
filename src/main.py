@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
-from utils import APIException, generate_sitemap
+from utils import APIException, generate_sitemap, validation_global_cooker
 from admin import setup_admin
 from models import db, Cooker, Called
 #from models import Person
@@ -29,10 +29,16 @@ def sitemap():
 
 @app.route('/cooker', methods=['POST'])
 def handle_new_cooker():
+    cooker = Cooker()
     new_cooker = request.get_json()
-    Cooker.add_cooker(new_cooker)
-    return  "s",200
-
+    validation = validation_global_cooker(new_cooker)
+    
+    if validation == True:
+        cooker.add_cooker(new_cooker)
+        return  "Success email",200
+    else:
+        return "Error syntaxis",406
+  
 @app.route('/cookers/<int:id>', methods=['GET'])
 def handle_cooker(id):
     return jsonify(Cooker.get_user(id)), 200
@@ -54,8 +60,9 @@ def handle_delete_cooker(id):
 
 @app.route('/called', methods=['POST'])
 def handle_new_called():
+    called = Called()
     new_called = request.get_json()
-    Called.add_called(new_called)
+    called.add_called(new_called)
     return "You creater new called", 201 
 
 @app.route('/calleds', methods=['GET'])

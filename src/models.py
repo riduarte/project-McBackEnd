@@ -11,7 +11,7 @@ class Cooker(db.Model):
     enterprise = db.Column(db.String(100), unique=False, nullable=False)
     name= db.Column(db.String(80), unique=False, nullable=False)
     last_name= db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(True), unique=False, nullable=False) 
+    is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False) 
     child = db.relationship('Called', lazy=True)
 
     def __repr__(self):
@@ -21,6 +21,7 @@ class Cooker(db.Model):
         return {
             "nickname": self.nickname,
             "email": self.email,
+            "password":self.password,
             "enterprise":self.enterprise,
             "name":self.name,
             "last_name":self.last_name,
@@ -43,20 +44,19 @@ class Cooker(db.Model):
 
         db.session.commit()
    
-    def add_cooker(cooker_data):
-        cooker_new= Cooker()
-        cooker_new.nickname = cooker_data["nickname"]
-        cooker_new.email = cooker_data["email"]
-        cooker_new.password = cooker_data["password"]
-        cooker_new.enterprise = cooker_data["enterprise"]
-        cooker_new.name = cooker_data["name"]
-        cooker_new.last_name = cooker_data["last_name"]
-        cooker_new.is_active= cooker_data["is_active"]
+    @classmethod
+    def add_cooker(cls,new_cooker):
+        new_cooker = cls (
+        nickname = new_cooker["nickname"],
+        email = new_cooker["email"],
+        password = new_cooker["password"],
+        enterprise = new_cooker["enterprise"],
+        name = new_cooker["name"],
+        last_name = new_cooker["last_name"])
 
-        db.session.add(cooker_new)
+        db.session.add(new_cooker)
         db.session.commit()
 
-   
     def delete_cooker(id):
         delete_cooker= Cooker.query.get(id)
         delete_cooker.is_active= False
@@ -68,36 +68,35 @@ class Called(db.Model):
     status = db.Column(db.String(80), unique=False, nullable=False)
     time = db.Column(db.Integer, unique=False,nullable=False)
     brand= db.Column(db.String(170), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(True), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False)
     parent_id= db.Column(db.Integer, db.ForeignKey('cooker.id'))
 
     def __repr__(self):
-        return f'<Called {self.order_code}>'
+        return f'<Called {self.called_code}>'
 
     def serialize(self):
         return {
+            "called_code": self.called_code,
             "id": self.id,
             "status": self.status,
             "time": self.time,
-            "brand":self.brand
+            "brand":self.brand,
+            "is_active":self.is_active
         }
-        
-    def add_called(order_data):
-        called_new= Called()
-        called_new.called_code = called_data["called_code"]
-        called_new.status = called_data["status"]
-        called_new.time= called_data["time"]
-        called_new.brand = called_data["brand"]
-        called_new.is_active= called_data["is_active"]
-        
-        db.session.add(called_new)
+    @classmethod  
+    def add_called(cls,called_data):    
+        called_data = cls(
+        called_code = called_data["called_code"],
+        status = called_data["status"],
+        time = called_data["time"],
+        brand = called_data["brand"])
+        db.session.add(called_data)
         db.session.commit()
 
     def get_all_called():
-        all_called = Called.query.filter_by( is_active = True).first()
-        all_called = all_orders.serialize()
+        all_called = Called.query.filter_by( is_active = True)
+        all_called = list(map(lambda x: x.serialize(),all_called))
         return all_called
-
 
     def get_called(called_id):
         called = Called.query.filter_by(id = called_id).first()
