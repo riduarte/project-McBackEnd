@@ -1,4 +1,5 @@
 from flask import jsonify, url_for
+from email.utils import parseaddr
 
 def validation_global_cooker(data):
     email_value = validation_email(data)
@@ -8,11 +9,13 @@ def validation_global_cooker(data):
 
 def validation_email(cooker_email):
     email = cooker_email.get("email")
-    if "@" in email:
+    list_email = parseaddr(email)
+    if "@" in list_email[1] and "." in list_email[1] and list_email[1] == email:
         return True
     else:
         return False
-        
+
+
 def validation_password(cooker_pass):
     password = cooker_pass.get("password")
     if len(password) > 6:
@@ -20,23 +23,6 @@ def validation_password(cooker_pass):
     else:
         return False
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class APIException(Exception):
     status_code = 400
 
