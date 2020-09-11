@@ -1,4 +1,5 @@
 import os
+import bcrypt
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -32,7 +33,8 @@ def login():
     if not request.is_json:
         return jsonify({"msg": "Missing JSON in request"}), 400
 
-    username = request.json.get('username', None)
+    username = request.json.get('nickname', None)
+    
     password = request.json.get('password', None)
     if not username:
         return jsonify({"msg": "Missing username parameter"}), 400
@@ -71,6 +73,15 @@ def handle_new_cooker():
     cooker = Cooker()
     new_cooker = request.get_json()
     validation = validation_global_cooker(new_cooker)
+    
+    check_new_username = request.json.get('nickname',None)
+    check_new_password = request.json.get('password',None)
+    
+    if not check_new_username:
+        return 'Missing username', 400
+    if not check_new_password:
+        return 'Missing password', 400
+
     if validation == True:
         cooker.add_cooker(new_cooker)
         return  "Success email",200

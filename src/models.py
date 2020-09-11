@@ -1,19 +1,41 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_utils import PasswordType
-
+import bcrypt
 
 db = SQLAlchemy()
 
+class Enterprise(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=False, nullable=False)
+    last_name = db.Column(db.String(80), unique=False, nullable=False)
+    kitchen_number = db.Column(db.String(80), unique=False, nullable=False)
+    hired_hours = db.Column(db.String(80), unique=False, nullable=False)
+    enterprise = db.Column(db.String(100), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False)
+    child = db.relationship('Called', lazy=True)
+    child = db.relationship('Cooker', lazy=True)
+
+    def __repr__(self):
+        return f'<Enterprise {self.name}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "hired_hours": self.hired_hours,
+            "kitchen_number":self.kitchen_number,
+            "name":self.name,
+            "last_name":self.last_name,
+        }
 class Cooker(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname= db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(120),PasswordType(schemes=['pbkdf2_sha512']), unique=False, nullable=False)
+    password = db.Column(db.String(250),unique=False,nullable=True)
     enterprise = db.Column(db.String(100), unique=False, nullable=False)
     name= db.Column(db.String(80), unique=False, nullable=False)
     last_name= db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False) 
-    child = db.relationship('Called', lazy=True)
+    is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False)
+    parent_id= db.Column(db.Integer, db.ForeignKey('enterprise.id'))
+    
 
     def __repr__(self):
         return f'<Cooker {self.nickname}>'
@@ -23,14 +45,14 @@ class Cooker(db.Model):
             "id": self.id,
             "nickname": self.nickname,
             "email": self.email,
-            "enterprise":self.enterprise,
+            "parent_id":self.enterprise,
             "name":self.name,
             "last_name":self.last_name,
         }
 
     def get_users():
         all_cookers= Cooker.query.filter_by( is_active = True)
-        all_cookers= list(map(lambda x: x.serialize(),all_cookers))
+        all_cookers= list(map(lambda x: x.serialize(),all_cookers))   
         return all_cookers
     
     def get_user(cooker_id):
@@ -51,12 +73,12 @@ class Cooker(db.Model):
         return "success",200
 
     @classmethod
-    def add_cooker(cls,new_cooker, email, password):
+    def add_cooker(cls,new_cooker):
         new_cooker = cls (
-        nickname = cls(email=email, password=password, is_active=True),
         email = new_cooker["email"],
-        password = new_cooker["password"],
+        password = bcrypt.hashpw(new_cooker["password"].encode('utf-8'),bcrypt.gensalt()),
         enterprise = new_cooker["enterprise"],
+        nickname = new_cooker["nickname"],
         name = new_cooker["name"],
         last_name = new_cooker["last_name"])
         db.session.add(new_cooker)
@@ -79,9 +101,9 @@ class Called(db.Model):
     called_code = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.Enum("espera","listo","entregado","cancelado","proceso"), unique=False, nullable=False)
     time = db.Column(db.Integer, unique=False,nullable=False)
-    brand= db.Column(db.String(170), unique=False, nullable=False)
+    brand= db.Column(db.String(280), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False)
-    parent_id= db.Column(db.Integer, db.ForeignKey('cooker.id'))
+    parent_id= db.Column(db.Integer, db.ForeignKey('enterprise.id'))
    
     #not_edit_file = ["id","brand","is_active"]
 
@@ -102,7 +124,7 @@ class Called(db.Model):
         called_code = called_data["called_code"],
         status = "espera",
         time = called_data["time"],
-        brand = called_data["brand"])
+        brand = "none")
         db.session.add(called_data)
         db.session.commit()
 
