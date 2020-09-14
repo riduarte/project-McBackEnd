@@ -18,6 +18,10 @@ flask-cors = "*"
 gunicorn = "*"
 mysqlclient = "*"
 flask-admin = "*"
+sqlalchemy-utils = "*"
+passlib = {extras = ["bcrypt"],version = "*"}
+flask-jwt-extended = {extras = ["asymmetric_crypto"],version = "*"}
+bcrypt = "*"
 
 [requires]
 python_version = "3.7"
