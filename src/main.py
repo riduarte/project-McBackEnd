@@ -15,8 +15,6 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
-#from models import Person
-
 app = Flask(__name__)
 
 app.url_map.strict_slashes = False
@@ -27,7 +25,7 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
-app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this!
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')  
 jwt = JWTManager(app)
 
 
@@ -93,6 +91,8 @@ def handle_new_cooker():
   
 @app.route('/cookers/<int:id>', methods=['GET'])
 def handle_cooker(id):
+    if Cooker.id =! id
+        return "Usuario no existe"
     return jsonify(Cooker.get_user(id)), 200
 
 @app.route('/cookers', methods=['GET'])
@@ -102,7 +102,6 @@ def handle_cookers():
 @app.route('/cookers/<int:id>', methods=['PATCH', 'PUT'])
 def handle_edit_Cooker(id): 
     cooker_edit= request.get_json()
-    
     return Cooker.set_user(id,cooker_edit)
 
 @app.route('/cookers/<int:id>', methods=['DELETE'])
@@ -123,7 +122,6 @@ def handle_all_called():
 
 @app.route('/calleds/<int:id>', methods=['GET'])
 def handle_called(id):
-    print("You have recived one called") 
     return jsonify(Called.get_called(id)), 200
 
 @app.route('/calleds/<int:id>', methods=['PATCH', 'PUT'])
