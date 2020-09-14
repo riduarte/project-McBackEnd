@@ -63,17 +63,17 @@ class Cooker(db.Model):
         delete_cooker.is_active= False
         db.session.commit()
 
-class Order(db.Model):
+class Called(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order_code = db.Column(db.String(20), unique=True, nullable=False)
+    called_code = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.String(80), unique=False, nullable=False)
     time = db.Column(db.Integer, unique=False,nullable=False)
     brand= db.Column(db.String(170), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(True), unique=False, nullable=False)
-    parent_id= db.Column (db.Integer, db.ForeignKey ('cooker.id'))
+    parent_id= db.Column(db.Integer, db.ForeignKey('cooker.id'))
 
     def __repr__(self):
-        return f'<Order {self.order_code}>'
+        return f'<Called {self.order_code}>'
 
     def serialize(self):
         return {
@@ -83,37 +83,37 @@ class Order(db.Model):
             "brand":self.brand
         }
         
-    def add_order(order_data):
-        order_new= Order()
-        order_new.order_code = order_data["order_code"]
-        order_new.status = order_data["status"]
-        order_new.time= order_data["time"]
-        order_new.brand = order_data["brand"]
-        order_new.is_active= order_data["is_active"]
+    def add_called(order_data):
+        called_new= Called()
+        called_new.called_code = called_data["called_code"]
+        called_new.status = called_data["status"]
+        called_new.time= called_data["time"]
+        called_new.brand = called_data["brand"]
+        called_new.is_active= called_data["is_active"]
         
-        db.session.add(order_new)
+        db.session.add(called_new)
         db.session.commit()
 
-    def get_orders():
-        all_orders= Order.query.filter_by( is_active = True).first()
-        all_orders= all_orders.serialize()
-        return all_orders
+    def get_all_called():
+        all_called = Called.query.filter_by( is_active = True).first()
+        all_called = all_orders.serialize()
+        return all_called
 
 
-    def get_order(order_id):
-        order= Order.query.filter_by(id = order_id).first()
-        order= order.serialize()
-        return order
+    def get_called(called_id):
+        called = Called.query.filter_by(id = called_id).first()
+        called = called.serialize()
+        return called
 
-    def setOrder(id, body):
-        order= Order.query.get(id)
+    def set_called(id, body):
+        called= Called.query.get(id)
         for key, value in body.items():
             if key != "id":
-                setattr(order,key,value)
+                setattr(called,key,value)
 
         db.session.commit()
 
-    def delete_order(id):
-        delete_order= Order.query.get(id)
-        delete_order.is_active= False
+    def delete_called(id):
+        delete_called = Called.query.get(id)
+        delete_called.is_active = False
         db.session.commit()

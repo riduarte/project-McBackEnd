@@ -52,31 +52,31 @@ def handle_delete_cooker(id):
     Cooker.delete_cooker(id) 
     return "You have delete cooker"
 
-@app.route('/order', methods=['POST'])
-def handle_new_order():
-    new_order = request.get_json()
-    Order.add_order(new_order)
-    return "You creater new order", 201 
+@app.route('/called', methods=['POST'])
+def handle_new_called():
+    new_called = request.get_json()
+    Called.add_called(new_called)
+    return "You creater new called", 201 
 
-@app.route('/orders', methods=['GET'])
-def handle_orders():
-    print("You have recived all orders") 
-    return jsonify(Order.get_orders()), 200
+@app.route('/calleds', methods=['GET'])
+def handle_all_called():
+    print("You have recived all calleds") 
+    return jsonify(Called.get_all_called()), 200
 
-@app.route('/orders/<int:id>', methods=['GET'])
-def handle_order(id):
-    print("You have recived one cooker") 
-    return jsonify(Order.get_order(id)), 200
+@app.route('/calleds/<int:id>', methods=['GET'])
+def handle_called(id):
+    print("You have recived one called") 
+    return jsonify(Called.get_called(id)), 200
 
-@app.route('/orders/<int:id>', methods=['PATCH', 'PUT'])
-def handle_edit_order(id):
-    order_edit= request.get_json()
-    Order.set_order(id,order_edit)
-    return "You have modificate order", 203
+@app.route('/calleds/<int:id>', methods=['PATCH', 'PUT'])
+def handle_edit_called(id):
+    called_edit= request.get_json()
+    Called.set_called(id,called_edit)
+    return "You have modificate called, 203
 
-@app.route('/orders/<int:id>', methods=['DELETE'])
+@app.route('/calleds/<int:id>', methods=['DELETE'])
 def handle_delete_order(id):
-    Order.delete_order(id) 
+   Called.delete_called(id) 
     return "You have delete order", 200
 
 # this only runs if `$ python src/main.py` is executed
