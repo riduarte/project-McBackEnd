@@ -50,17 +50,17 @@ class Cooker(db.Model):
             "last_name":self.last_name,
         }
 
-    def get_users():
+    def get_cookers():
         all_cookers= Cooker.query.filter_by( is_active = True)
         all_cookers= list(map(lambda x: x.serialize(),all_cookers))   
         return all_cookers
     
-    def get_user(cooker_id):
+    def get_cooker(cooker_id):
         cooker= Cooker.query.filter_by(id = cooker_id).first()
         cooker = cooker.serialize()
         return cooker
 
-    def set_user(id, body):
+    def update_cooker(id, body):
         not_edit_file = ["id","enterprise","is_active"]  
         cooker = Cooker.query.get(id)
         for key, value in body.items():
@@ -70,7 +70,7 @@ class Cooker(db.Model):
                 setattr(cooker,key,value)       
         db.session.add(cooker)
         db.session.commit()
-        return "success",200
+        return cooker
 
     @classmethod
     def add_cooker(cls,new_cooker):
@@ -92,9 +92,9 @@ class Cooker(db.Model):
             db.session.add(delete_cooker)
             db.session.commit()
             delete_cooker = delete_cooker.serialize()
-            return delete_cooker,200
+            return delete_cooker
         else:
-            return "Error",400
+            return "Error"
 
 class Called(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -138,17 +138,17 @@ class Called(db.Model):
         called = called.serialize()
         return called
     
-    def set_called(id, body):
+    def update_called(id, body):
         not_edit_file = ["id","brand","is_active"]  
         called = Called.query.get(id)
         for key, value in body.items():
             if key in not_edit_file:
-                return "error", 400
+                return "error"
             elif key not in not_edit_file:
                 setattr(called,key,value)
         db.session.add(called)
         db.session.commit()
-        return "Success",200
+        return "Success"
 
     def delete_called(id):
         delete_called = Called.query.get(id)
@@ -157,7 +157,7 @@ class Called(db.Model):
             db.session.add(delete_called)
             db.session.commit()
             delete_called = delete_called.serialize()
-            return delete_called,200
+            return delete_called
         else:
-            return "Error",400
+            return "Error"
 

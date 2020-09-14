@@ -31,21 +31,21 @@ def sitemap():
 def handle_new_cooker():
     new_cooker = request.get_json()
     Cooker.add_cooker(new_cooker)
-    return  "s",200
+    return  "success",200
 
 @app.route('/cookers/<int:id>', methods=['GET'])
 def handle_cooker(id):
-    return jsonify(Cooker.get_user(id)), 200
+    return jsonify(Cooker.get_cooker(id)), 200
 
 @app.route('/cookers', methods=['GET'])
 def handle_cookers():
-    return jsonify(Cooker.get_users()), 200
+    return jsonify(Cooker.get_cookers()), 200
 
 @app.route('/cookers/<int:id>', methods=['PATCH', 'PUT'])
 def handle_edit_Cooker(id): 
     cooker_edit= request.get_json()
-    Cooker.set_user(id,cooker_edit)
-    return "You have modificate  cooker", 203
+    Cooker.update_cooker(id,cooker_edit)
+    return "You have modificate cooker", 203
 
 @app.route('/cookers/<int:id>', methods=['DELETE'])
 def handle_delete_cooker(id):
@@ -71,7 +71,7 @@ def handle_called(id):
 @app.route('/calleds/<int:id>', methods=['PATCH', 'PUT'])
 def handle_edit_called(id):
     called_edit= request.get_json()
-    Called.set_called(id,called_edit)
+    Called.update_called(id,called_edit)
     return "You have modificate called, 203
 
 @app.route('/calleds/<int:id>', methods=['DELETE'])
