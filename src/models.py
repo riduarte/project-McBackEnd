@@ -139,6 +139,7 @@ class Called(db.Model):
         else:
             return "Error",400
 
+
 class UserOAuth(db.Model, UserMixin):
     id = db.Column(db.String(767), primary_key=True)
     email = db.Column(db.String(767), unique=True, nullable=False)
