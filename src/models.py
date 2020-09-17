@@ -1,18 +1,21 @@
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 
-db = SQLAlchemy()
+db = SQLAlchemy() 
 
 class Enterprise(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nickname= db.Column(db.String(80), unique=True, nullable=False)
     name = db.Column(db.String(80), unique=False, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(250),unique=False,nullable=True)
     last_name = db.Column(db.String(80), unique=False, nullable=False)
     kitchen_number = db.Column(db.String(80), unique=False, nullable=False)
     hired_hours = db.Column(db.String(80), unique=False, nullable=False)
     enterprise = db.Column(db.String(100), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False)
-    child = db.relationship('Called', lazy=True)
-    child = db.relationship('Cooker', lazy=True)
+    called_child = db.relationship('Called', lazy=True)
+    cooker_child = db.relationship('Cooker', lazy=True)
 
     def __repr__(self):
         return f'<Enterprise {self.name}>'
@@ -25,6 +28,26 @@ class Enterprise(db.Model):
             "name":self.name,
             "last_name":self.last_name,
         }
+    @classmethod
+    def add_enterprise(cls,new_enterprise):
+        new_enterprise = cls (
+        hired_hours = "horas",
+        kitchen_number = 1,
+        email = new_enterprise["email"],
+        password = bcrypt.hashpw(new_enterprise["password"].encode('utf-8'),bcrypt.gensalt()),
+        enterprise = new_enterprise["enterprise"],
+        nickname = new_enterprise["nickname"],
+        name = new_enterprise["name"],
+        last_name = new_enterprise["last_name"])
+        db.session.add(new_enterprise)
+        db.session.commit()
+        return new_enterprise
+
+    def get_enterprises():
+        all_enterprises = Enterprise.query.filter_by( is_active = True)
+        all_enterprises = list(map(lambda x: x.serialize(),all_enterprises))  
+        return all_enterprises
+
 class Cooker(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname= db.Column(db.String(80), unique=True, nullable=False)
@@ -100,12 +123,11 @@ class Called(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     called_code = db.Column(db.String(20), unique=True, nullable=False)
     status = db.Column(db.Enum("espera","listo","entregado","cancelado","proceso"), unique=False, nullable=False)
-    time = db.Column(db.Integer, unique=False,nullable=False)
-    brand= db.Column(db.String(280), unique=False, nullable=False)
+    time = db.Column(db.String(280), unique=False,nullable=False)
+    brand = db.Column(db.String(280), unique=False, nullable=False)
+    room = db.Column(db.String(280), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(),default= True, unique=False, nullable=False)
     parent_id= db.Column(db.Integer, db.ForeignKey('enterprise.id'))
-   
-    #not_edit_file = ["id","brand","is_active"]
 
     def __repr__(self):
         return f'<Called {self.called_code}>'
@@ -116,7 +138,9 @@ class Called(db.Model):
             "called_code": self.called_code,
             "status": self.status,
             "time": self.time,
-            "brand":self.brand
+            "brand":self.brand,
+            "room":self.room
+           
         }
     @classmethod  
     def add_called(cls,called_data):    
@@ -124,7 +148,9 @@ class Called(db.Model):
         called_code = called_data["called_code"],
         status = "espera",
         time = called_data["time"],
-        brand = "none")
+        brand = called_data["brand"],
+        room = called_data["room"]
+        )
         db.session.add(called_data)
         db.session.commit()
 

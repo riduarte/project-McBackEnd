@@ -6,7 +6,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap, validation_global_cooker
 from admin import setup_admin
-from models import db, Cooker, Called
+from models import db, Cooker, Called, Enterprise
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
@@ -66,6 +66,30 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+@app.route('/enterprise', methods=['POST'])
+def handle_new_enterprise():
+    enterprise = Enterprise()
+    new_enterprise = request.get_json()
+    validation = validation_global_cooker(new_enterprise)
+    
+    check_new_username = request.json.get('nickname',None)
+    check_new_password = request.json.get('password',None)
+    
+    if not check_new_username:
+        return 'Missing username', 400
+    if not check_new_password:
+        return 'Missing password', 400
+
+    if validation == True:
+        enterprise.add_enterprise(new_enterprise)
+        return  "Success email",200
+    else:
+        return "Error syntaxis",406
+
+@app.route('/enterprises', methods=['GET'])
+def handle_enterprises():
+    return jsonify(Enterprise.get_enterprises())
+
 @app.route('/cooker', methods=['POST'])
 def handle_new_cooker():
     cooker = Cooker()
@@ -88,13 +112,11 @@ def handle_new_cooker():
   
 @app.route('/cookers/<int:id>', methods=['GET'])
 def handle_cooker(id):
-    if Cooker.id =! id
-        return "Usuario no existe"
-    return jsonify(Cooker.get_user(id)), 200
+    return jsonify(Cooker.get_cooker(id)), 200
 
 @app.route('/cookers', methods=['GET'])
 def handle_cookers():
-    return jsonify(Cooker.get_users())
+    return jsonify(Cooker.get_cookers())
 
 @app.route('/cookers/<int:id>', methods=['PATCH', 'PUT'])
 def handle_edit_Cooker(id): 
@@ -124,7 +146,7 @@ def handle_called(id):
 @app.route('/calleds/<int:id>', methods=['PATCH', 'PUT'])
 def handle_edit_called(id):
     called_edit = request.get_json()
-    return Called.set_called(id,called_edit)
+    return Called.update_called(id,called_edit)
 
 @app.route('/calleds/<int:id>', methods=['DELETE'])
 def handle_delete_called(id):
