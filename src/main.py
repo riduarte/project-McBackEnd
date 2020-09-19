@@ -21,31 +21,25 @@ MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
 setup_admin(app)
-
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')  
 jwt = JWTManager(app)
-
 
 @app.route('/login', methods=['POST'])
 def login():
     if not request.is_json:
         return jsonify({"msg": "Missing JSON in request"}), 400
-
     username = request.json.get('nickname', None)
-    
     password = request.json.get('password', None)
     if not username:
         return jsonify({"msg": "Missing username parameter"}), 400
     if not password:
         return jsonify({"msg": "Missing password parameter"}), 400
-
-    if username != 'test' or password != 'test':
+    cooker = Cooker.get_cooker_login(username, password)
+    if cooker == None :
         return jsonify({"msg": "Bad username or password"}), 401
-
     # Identity can be any data that is json serializable
     access_token = create_access_token(identity=username)
-    return jsonify(access_token=access_token), 200
-
+    return jsonify(access_token=access_token, cooker=cooker.serialize()), 200
 
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.
@@ -71,15 +65,12 @@ def handle_new_enterprise():
     enterprise = Enterprise()
     new_enterprise = request.get_json()
     validation = validation_global_cooker(new_enterprise)
-    
     check_new_username = request.json.get('nickname',None)
     check_new_password = request.json.get('password',None)
-    
     if not check_new_username:
         return 'Missing username', 400
     if not check_new_password:
         return 'Missing password', 400
-
     if validation == True:
         enterprise.add_enterprise(new_enterprise)
         return  "Success email",200
@@ -95,21 +86,18 @@ def handle_new_cooker():
     cooker = Cooker()
     new_cooker = request.get_json()
     validation = validation_global_cooker(new_cooker)
-    
     check_new_username = request.json.get('nickname',None)
     check_new_password = request.json.get('password',None)
-    
     if not check_new_username:
         return 'Missing username', 400
     if not check_new_password:
         return 'Missing password', 400
-
     if validation == True:
         cooker.add_cooker(new_cooker)
         return  "Success email",200
     else:
         return "Error syntaxis",406
-  
+
 @app.route('/cookers/<int:id>', methods=['GET'])
 def handle_cooker(id):
     return jsonify(Cooker.get_cooker(id)), 200
